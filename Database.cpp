@@ -445,34 +445,9 @@ std::string database::fillRules()
     for (int i = 0; i < rulesDAG.size(); i++)
     {
         std::set<graph::node*, graph::node_compare>::iterator innerCounter;
-        int numPasses = 0;
-        std::vector<bool> changed;
-        changed.push_back(true);
-        while (changed[0])
-        {
-            innerCounter = rulesDAG[i].begin();
-            if (checkTrivial(rulesDAG[i])) //rule is trivial
-            {
-                evalRule(_rules[(*innerCounter)->getID()]);
-//                numPasses = 1;
-                changed[0] = false;
-            }
-            else //rule is nontrivial
-            {
-                for (int j = 0; j < rulesDAG[i].size(); j++)
-                {
-                    if (j == 0) changed[j] = evalRule(_rules[(*innerCounter)->getID()]);
-                    else
-                    {
-                        changed.push_back(evalRule(_rules[(*innerCounter)->getID()]));
-                        changed[0] = changed[0] || changed[j];
-                    }
-                    while (changed.size() > 1) changed.pop_back();
-                    innerCounter++;
-                }
-            }
-            numPasses++;
-        }
+        
+        int numPasses = ruleFillHelper(innerCounter, rulesDAG, i);
+        
         innerCounter = rulesDAG[i].begin();
         ss << numPasses << " passes: R" << (*innerCounter)->getID();
         innerCounter++;
@@ -484,6 +459,43 @@ std::string database::fillRules()
     }
     
     return ss.str();
+}
+
+int database::ruleFillHelper(std::set<graph::node*, graph::node_compare>::iterator innerCounter,
+                              std::vector<std::set<graph::node*, graph::node_compare>> &rulesDAG,
+                              int &i)
+{
+    //
+    int numPasses = 0;
+    std::vector<bool> changed;
+    changed.push_back(true);
+    while (changed[0])
+    {
+        innerCounter = rulesDAG[i].begin();
+        if (checkTrivial(rulesDAG[i])) //rule is trivial
+        {
+            evalRule(_rules[(*innerCounter)->getID()]);
+            //                numPasses = 1;
+            changed[0] = false;
+        }
+        else //rule is nontrivial
+        {
+            for (int j = 0; j < rulesDAG[i].size(); j++)
+            {
+                if (j == 0) changed[j] = evalRule(_rules[(*innerCounter)->getID()]);
+                else
+                {
+                    changed.push_back(evalRule(_rules[(*innerCounter)->getID()]));
+                    changed[0] = changed[0] || changed[j];
+                }
+                while (changed.size() > 1) changed.pop_back();
+                innerCounter++;
+            }
+        }
+        numPasses++;
+    }
+    //
+    return numPasses;
 }
 
 bool database::checkTrivial(std::set<graph::node*, graph::node_compare>& here)

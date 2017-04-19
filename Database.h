@@ -34,14 +34,27 @@ public:
     //join helper functions
     bool rightCriteriaFinder(std::vector<std::string> &rightCriteria, std::vector<int> &rightFound, std::vector<std::string> &rMap);
     bool leftCriteriaFinder(std::vector<std::string> &leftCriteria,relation &rLeft);
-    bool checkFailConditions(std::vector<std::string> &leftCriteria, std::vector<std::string> &rightCriteria, relation &rLeft, relation &rRight, std::vector<int> &rightFound, bool &leftFoundTest);
-    bool relJoinHelper(int leftSize, int rightSize, std::vector<int> &leftFound, std::vector<int> &rightFound, std::set<tuple, relation::tuple_compare> &rightTuples, std::set<tuple, relation::tuple_compare>::iterator leftCounter, relation &retVal);
-    bool relJoinCheckParallel(std::vector<int> &leftFound, std::vector<int> &rightFound, std::set<tuple, relation::tuple_compare>::iterator leftCounter, std::set<tuple, relation::tuple_compare>::iterator rightCounter);
+    bool checkFailConditions(std::vector<std::string> &leftCriteria,
+                             std::vector<std::string> &rightCriteria,
+                             relation &rLeft, relation &rRight,
+                             std::vector<int> &rightFound,
+                             bool &leftFoundTest);
+    bool relJoinHelper(int leftSize, int rightSize,
+                       std::vector<int> &leftFound,
+                       std::vector<int> &rightFound,
+                       std::set<tuple, relation::tuple_compare> &rightTuples,
+                       std::set<tuple, relation::tuple_compare>::iterator leftCounter,
+                       relation &retVal);
+    bool relJoinCheckParallel(std::vector<int> &leftFound,
+                              std::vector<int> &rightFound,
+                              std::set<tuple, relation::tuple_compare>::iterator leftCounter,
+                              std::set<tuple, relation::tuple_compare>::iterator rightCounter);
     bool addNonParallel(std::vector<std::string> &jointAttributes,std::set<tuple, relation::tuple_compare>::iterator rightCounter, std::vector<int> &rightFound);
     
     
     relation crossProduct (relation &rLeft, relation &rRight);
-    bool addAttributes(std::vector<std::string> &hold, std::set<tuple, relation::tuple_compare>::iterator counter);
+    bool addAttributes(std::vector<std::string> &hold,
+                       std::set<tuple, relation::tuple_compare>::iterator counter);
     bool removeAttributes(std::vector<std::string> &hold, int numAttributes);
     std::string fillRules();
     bool evalRule(rule &check);
@@ -53,6 +66,9 @@ public:
     std::vector<rule> getRules();
     bool checkTrivial(std::set<graph::node*, graph::node_compare>& here);
     bool checkChildrenForLoop(graph::childNode* here, int check);
+    int ruleFillHelper(std::set<graph::node*, graph::node_compare>::iterator innerCounter,
+                       std::vector<std::set<graph::node*, graph::node_compare>> &rulesDAG,
+                       int &i);
 private:
     std::vector<relation*> _relations;
     std::queue<predicate> _queries;
